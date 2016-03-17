@@ -1,0 +1,79 @@
+---------------------------------------------
+Introducción a la administración de sistemas
+FAI - UNCOMA - 2016
+TRABAJO PRÁCTICO I : Editor de Textos VI/VIM
+---------------------------------------------
+
+Los siguientes ejercicios se realizan en su totalidad desde una terminal en un sistema GNU/Linux.
+
+Repaso
+------
+1- ¿Qué comando utiliza para saber en cuál directorio se encuentra usted trabajando? 
+
+2- Obteniendo ayuda:
+	a) ¿Cómo saber cuáles son las opciones soportadas por un comando sin recurrir a Internet?
+	b) Obtenga ayuda acerca del comando de ayuda.
+
+3- Lea de principio a fin la hoja de ayuda (cheat sheet) provista por la cátedra y utilice 
+   cada uno de los comandos listados en la misma. Tenga en cuenta que esta hoja de ayuda será
+   de utilidad durante todo el cursado de la materia, comience a familiarizarse con ella. 
+
+3a- Investigue el uso del término "cheat sheet" en el mundo de los admnistradores de sistema.  
+
+4- Obtenga ayuda del sistema sobre cada uno de los comandos de la hoja de ayuda. Verifique 
+   que efectivamente la ayuda que obtiene se refiere al comando en cuestión. 
+
+5- Mencione al menos cuatro métodos que le permitan iniciar una sesión en el sistema. Para
+   cada uno de ellos indique si requiere estar físicamente frente a la computadora, y si 
+   además requiere entorno gráfico. 
+
+6- Si usted se encuentra sentado frente a una computadora, trabajando con un teclado y 
+   un monitor conectado a la misma. ¿Puede usted estar completamente seguro de que es el 
+   único usuario utilizando dicha computadora? Investigue algún comando que le permita 
+   responder esta pregunta. 
+
+7- ¿Tiene sentido que una computadora moderna no tenga entorno gráfico? 
+
+8- Averigue cuántos procesos (eso es, programas en ejecución) hay 
+   en la máquina en la que está trabajando. ¿Reconoce algún programa? 
+
+
+VIM
+---
+1- Ejecute la siguiente secuencia:
+
+	- vim ej1.txt
+	- Pasar a modo de inserción presionando "i"
+	- Escribir tres líneas a elección
+	- Volver al modo normal presionando "ESC"
+	- :wq
+	- Observar el contenido del archivo ej1.txt con el comando "cat"
+
+2- Ejecute la siguiente secuencia:
+
+	- vim ej1.txt
+ 	- Moverse con los cursores a la línea del medio
+	- Ejecutar dd
+	- :wq
+	- Observar el contenido del archivo ej1.txt con el comando cat
+	- Explicar qué sucedió
+
+3- Instale la extensión (plugin) de Vim HJKL (copie el archivo hjkl.vim en ~/.vim/plugin/). (*)
+   Abra una terminal, ejecute vim y posteriormente el comando :HJKL en modo normal.
+   Juegue hasta sentirse cómodo con las teclas hjkl.
+
+4- Ejecute la siguiente secuencia
+
+	- vimtutor
+	- Guarde el contenido de vimtutor en un archivo en su home, ejecutando en modo normal:
+	  :saveas tutor.<hostname> (reemplazando <hostname> por el nombre de la máquina que
+	  Ud. está utilizando)
+	- Agregue su nombre y apellido al comienzo del archivo
+	- Complete las lecciones ofrecidas por el tutor
+	- Guarde sus cambios a medida que avanza:
+         :w (verifique el archivo donde esta guardando sus cambios con el comando cat)
+
+5- Indique al menos dos editores de texto de línea de comandos adicionales a vi.
+
+------------------------------------------------------------
+(*) http://www.vim.org/scripts/script.php?script_id=3409
