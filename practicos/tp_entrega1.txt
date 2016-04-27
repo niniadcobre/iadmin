@@ -1,0 +1,77 @@
+Los siguientes ejercicios deben ser entregados por escrito, de su puño y letra. 
+Fecha de entrega: 29/04/2016 
+
+Ejercicio 1)
+Asumiendo que un administrador ejecuta el siguiente comando para:  
+
+a) obtener la lista de procesos que ejecuta el usuario asimov: 
+ps -ef |grep asimov 
+
+	1 - Indique al menos dos razones por las que el comando ejecutado 
+        NO es óptimo para llevar a cabo esa tarea. 
+	2 - Indique dos formas alternativas de llevar a cabo esta tarea
+ 	utilizando dos programas diferentes (uno puede ser ps). 
+
+
+b ) obtener el listado de archivos que finalicen con las letras pdf: 
+ls |grep pdf 
+
+	1 - Indique al menos dos razones por las que el comando ejecutado 
+        NO es óptimo para llevar a cabo esa tarea. 
+	2 - Indique dos formas alternativas de llevar a cabo esta tarea
+ 	utilizando dos programas diferentes (uno puede ser ls). 
+	4 - ¿Esta usted considerando _TODOS_ los archivos en el directorio?
+        
+
+Ejercicio 2)
+Observe la secuencia a continuación: 
+
+$cat archivoquenoexiste > /tmp/error 
+cat: archivoquenoexiste: No existe el fichero o el directorio
+$ cat /tmp/error
+$ 
+
+a) Explique por qué el archivo /tmp/error se encuentra vacío, y por qué 
+el error se muestra por pantalla en lugar de guardarse en el archivo 
+de error. 
+
+b) Indique alguna manera tal que el mensaje de error se guarde en el archivo 
+/tmp/error y no se emita por pantalla. 
+
+Ejercicio 3) 
+a) Explique claramente cómo la variable de entorno PATH afecta al trabajo en el
+shell. 
+
+b) Si borramos el contenido de la variable de entorno PATH, ¿por qué el comando 
+cd aún sigue funcionando?
+
+
+Ejercicio 4) 
+a) Dónde se encuentran generalmente las aplicaciones de usuario como vi o un 
+navegador web en una distribución GNU/Linux? ¿Por qué no en /bin?
+
+b) Utilizando el comando file indique cuál es el tipo de archivo de /bin/bash. 
+¿Qué es este programa? ¿Cuál podría ser el equivalente a este tipo de archivos
+en un sistema Microsoft Windows? 
+
+c) ¿Cuál es la salida del comando file sobre un archivo exe de Microsoft 
+Windows? ¿Puede ejecutar directamente este tipo de archivos en GNU/Linux? 
+Explique. 
+
+
+Ejercicio 5) Utilizando comandos responda: 
+a) ¿Cuántos archivos hay en bin y /usr/bin? ¿Qué tamaño total ocupa cada uno 
+de estos directorios?  
+
+b) ¿Cuántos de los archivos en /bin y /usr/bin tienen permiso de ejecución 
+para el propietario?
+
+Ejercicio 6) 
+a) ¿Qué tipo de archivo es /dev/null? ¿A quién pertenece? ¿Para qué sirve?
+¿Cuáles son sus permisos? De un ejemplo de uso. 
+
+b) Investigue el uso de la letra t en lugar de la letra x que aparece en 
+la siguiente salida: 
+$ ls -ld /tmp/
+drwxrwxrwt 13 root root 12288 abr 22 15:15 /tmp/
+
