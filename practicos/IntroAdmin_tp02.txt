@@ -1,0 +1,331 @@
+------------------------------------------------
+Introducción a la administración de sistemas
+FAI - UNCOMA - 2014
+TRABAJO PRÁCTICO II : Reconocimiento del Sistema
+------------------------------------------------
+
+Los siguientes ejercicios se realizan en su totalidad en el equipo asignado 
+al grupo. Utilice redirección y el editor vi para guardar las salidas y editar 
+los resultados de este práctico. En el archivo de resolución indique su nombre 
+y apellido, y el número de ejercicio a resolver, junto a la salida incluyendo 
+el comando que ejecuta.
+
+NOTA: PARA CADA COMANDO EJECUTADO REALICE EL EJERCICIO DE PREGUNTARSE:
+	¿Cual es el comando?
+	¿Cuales son las opciones?
+	¿Cuáles y de que tipo son los argumentos? 
+	¿Estoy utilizando metacaracteres? ¿Cual?
+
+!!!!!!!!!!
+¡¡¡TIPS!!!
+¡¡¡¡¡¡¡¡¡¡
+
+TIP1: en modo normal los comandos :vsplit y :split permiten trabajar con 
+dos (o mas) archivos en simultáneo. Con Ctrl+w cambiamos el foco de un archivo
+al otro. Esto nos permite copiar textos entre ambos archivos. 
+
+TIP2: en modo normal, el comando :set number / :set nonumber muestra o esconde 
+el número de líneas. Note que es sólo para referencia, el número de línea no 
+pertenece al texto. 
+
+TIP3: en modo normal, el comando !! permite ejecutar un comando e insertar su
+resultado directamente en el texto. 
+
+TIP4: en modo normal, el comando :! permite ejecutar un comando en el shell y 
+volver a la edición de texto sin insertar ningún resultado. 
+
+
+Procesos
+--------
+
+Un proceso es un programa en ejecución. En un momento dado, un sistema operativo
+manipula decenas e incluso centenas de procesos para cumplir con las demandas
+de los usuarios. 
+
+Ayuda: ps ; man ps
+
+	1- Obtenga la lista de todos los programas en ejecución, incluyendo al 
+menos la siguiente información: dueño del proceso, identificador de proceso 
+(PID), identificador del padre (PPID), comando que inició el proceso. Guarde 
+esta salida en un archivo llamado tp02-1.txt
+
+	2- De la lista anterior identifique cuál es el primer proceso del 
+sistema.
+
+Usando el editor vi:
+--------------------
+
+	3- De la lista obtenida en el ejercicio 1, obtenga exclusivamente 
+aquellos que son hijo directos del primer proceso del sistema. ¿Cómo obtuvo el 
+listado? (recuerde n1,n2y en modo normal copia las líneas n1 a n2).
+
+Entorno del shell
+-----------------
+
+Ayuda: env
+
+	1- De la lista de variables de entorno de su shell, obtenga únicamente 
+el valor de la variable LANG y redirija la salida a un archivo llamado 
+tp02-2.txt. ¿Qué valor tiene la variable? 
+
+	2- Obtenga solamente el valor de la variable LANG ejecutando:
+echo $LANG. ¿Qué función cumple esta variable, por ejemplo cuando ejecutamos 
+el comando man? ¿Qué metacaracter utilizó en el comando anterior? 
+
+	3- Cambiar el valor de la variable PS1 ejecutando: 
+PS1='Ingrese el comando a ejecutar: '. Ejecutar algunos comandos al azar. ¿Qué 
+observa?. Redefinir la variable	ejecutando PS1='\u@\H:\w\$'. En la página de 
+manual de bash busque y lea la sección INDICADORES para entender cómo funciona 
+esta última asignación.
+
+	4- Ejecutar la siguiente secuencia:
+		
+		$ echo $HOME
+		$ cd
+		$ pwd
+		$ HOME=/tmp
+		$ cd
+		$ pwd
+		$ ¿Qué observa? ¿Qué función cumple la variable $HOME?
+
+Comodines
+---------
+
+	1- Crear un directorio llamado test/ e ingresar al mismo. Los 
+	incisos siguientes se deberán realizar dentro de dicho directorio.
+
+	2- En un shell bash ejecute los siguientes comandos:
+
+	Crear un archivo llamado creador.sh con el siguiente texto:
+	
+	#-------------------------------------
+	#!/bin/bash
+
+	for ((i=0;i<4;i++));do
+	   for((j=0;j<10;j++));do
+
+		if [ $i -lt 2 ];then
+		    echo "Archivo $i$j" > Cap$i$j.txt
+		elif [ $i -lt 3 ] ; then
+		    echo "Otro archivo $i$j" > cap$i$j.txt
+	        else
+		    echo "Esto NO es un PDF $i$j" > Cap$j.pdf
+		fi
+	   done
+         done
+	#-------------------------------------
+
+		- Asigne permisos de ejecución al archivo: 
+		chmod u+x creador.sh (observe los permisos con el comando ls -l)
+		- Liste el contenido del directorio test.
+		- Ejecute el script recién creado: ./creador.sh
+		- Liste el contenido del directorio test. ¿cuál es la función 
+		del script creador.sh?
+
+	3- Utilice comodines tal que el comando ls liste todos los archivos 		
+	finalizados en ".txt"
+
+	4- Utilice comodines tal que el comando ls liste todos los archivos 		
+	que comienzan con "cap" y  finalizan en ".txt"
+
+	5- Utilice comodines tal que el comando cat muestre el contenido de 
+	los archivos Cap10.txt a Cap19.txt
+	
+	6- Utilice comodines tal que el comando cat muestre el contenido de 
+	los archivos cuyo nombre contenga cualquiera de los siguientes números:
+	03, 04, 05, 23, 24 y 25
+
+	7- Utilice comodines tal que se muestre el contenido de todos los 
+	archivos que comiencen con "cap" o "Cap" seguidos de un dígito y solo 
+	uno, y finalicen en "2.txt"
+
+	8- ¿Qué tipo de archivos son los finalizados en "pdf"? ¿Que conclusion
+	puede sacar acerca de las extensiones en los sistemas GNU/Linux? 
+	(ayuda comando file)
+
+	9- Utilice comodines tal que el comando rm elimine todos los archivos
+	del directorio test a excepción de creador.sh
+
+
+Redirección y filtros
+---------------------
+
+	1- Ejecute el comando "who". ¿Qué información obtiene? Confirme 
+	revisando el man del comando. 
+	
+	2- El comando wc (del inglés "word count") permite con la opción -l 
+	(vea man wc) contar líneas en un archivo. Utilice este comando y | 
+	para obtener el número de usuarios que iniciaron sesión en el sistema
+	
+	3- Ingrese el directorio test creado en la sección "comodines" y 
+	vuelva a ejecutar el script creador.sh
+	
+	4- Utilizando el comando cat muestre el contenido de los archivos 
+	finalizados en txt o pdf
+
+	5- Ídem anterior pero esta vez redireccione la salida a un archivo 
+	llamado capitulos.txt
+
+	6- Utilizando el comando grep obtenga del archivo capitulos.txt las 
+	líneas que contengan el dígito 3
+	
+	7- Utilizando el comando grep obtenga directamente de la salida de 
+	cat (esto es sin usar un archivo intermedio) las líneas que contengan
+	la palabra archivo (ya sea en minúsculas o mayúsculas). Ayuda: en 
+	inglés si algo es sensible a la diferencia entre mayúsculas y 
+	minúsculas se dice "case sensitive", por otro lado si no lo es se 
+	dice "case insensitive" man grep.
+
+	8- Utilizando el comando grep obtenga la lista de procesos que 
+	corresponden solamente al usuario root
+
+UID        PID  PPID  C STIME TTY          TIME CMD
+root         1     0  0 18:12 ?        00:00:00 init [2]  
+root         2     0  0 18:12 ?        00:00:00 [kthreadd]
+root         3     2  0 18:12 ?        00:00:00 [ksoftirqd/0]
+root         4     2  0 18:12 ?        00:00:01 [kworker/0:0]
+root         6     2  0 18:12 ?        00:00:00 [migration/0]
+root         7     2  0 18:12 ?        00:00:00 [watchdog/0]
+root         8     2  0 18:12 ?        00:00:00 [cpuset]
+root         9     2  0 18:12 ?        00:00:00 [khelper]
+root        10     2  0 18:12 ?        00:00:00 [kdevtmpfs]
+root        11     2  0 18:12 ?        00:00:00 [netns]
+root        12     2  0 18:12 ?        00:00:00 [sync_supers]
+root        13     2  0 18:12 ?        00:00:00 [bdi-default]
+root        14     2  0 18:12 ?        00:00:00 [kintegrityd]
+root        15     2  0 18:12 ?        00:00:00 [kblockd]
+root        17     2  0 18:12 ?        00:00:00 [khungtaskd]
+root        18     2  0 18:12 ?        00:00:00 [kswapd0]
+root        19     2  0 18:12 ?        00:00:00 [ksmd]
+root        20     2  0 18:12 ?        00:00:00 [khugepaged]
+root        21     2  0 18:12 ?        00:00:00 [fsnotify_mark]
+root        22     2  0 18:12 ?        00:00:00 [crypto]
+root        99     2  0 18:12 ?        00:00:00 [khubd]
+root       133     2  0 18:12 ?        00:00:00 [firewire]
+root       177     2  0 18:12 ?        00:00:00 [ata_sff]
+root       184     2  0 18:12 ?        00:00:00 [scsi_eh_0]
+root       185     2  0 18:12 ?        00:00:00 [scsi_eh_1]
+root       186     2  0 18:12 ?        00:00:00 [scsi_eh_2]
+root       187     2  0 18:12 ?        00:00:00 [scsi_eh_3]
+root       188     2  0 18:12 ?        00:00:00 [scsi_eh_4]
+root       189     2  0 18:12 ?        00:00:00 [scsi_eh_5]
+root       192     2  0 18:12 ?        00:00:00 [kworker/u:4]
+root       193     2  0 18:12 ?        00:00:00 [kworker/u:5]
+root       194     2  0 18:12 ?        00:00:00 [kworker/u:6]
+root       222     2  0 18:12 ?        00:00:00 [md]
+root       238     2  0 18:12 ?        00:00:00 [jbd2/sda2-8]
+root       239     2  0 18:12 ?        00:00:00 [ext4-dio-unwrit]
+root       381     1  0 18:12 ?        00:00:00 udevd --daemon
+root       608   381  0 18:12 ?        00:00:00 udevd --daemon
+root       609   381  0 18:12 ?        00:00:00 udevd --daemon
+root       644     2  0 18:12 ?        00:00:00 [cfg80211]
+root       655     2  0 18:12 ?        00:00:00 [iwlwifi]
+root       663     2  0 18:13 ?        00:00:00 [hci0]
+root       666     2  0 18:13 ?        00:00:00 [kpsmoused]
+root       668     2  0 18:13 ?        00:00:00 [hd-audio0]
+root       700     2  0 18:13 ?        00:00:00 [flush-8:0]
+root       909     2  0 18:13 ?        00:00:00 [kvm-irqfd-clean]
+root      1731     2  0 18:13 ?        00:00:00 [jbd2/sda5-8]
+root      1732     2  0 18:13 ?        00:00:00 [ext4-dio-unwrit]
+root      2318     1  0 18:13 ?        00:00:00 /sbin/rpcbind -w
+statd     2347     1  0 18:13 ?        00:00:00 /sbin/rpc.statd
+root      2352     2  0 18:13 ?        00:00:00 [rpciod]
+root      2354     2  0 18:13 ?        00:00:00 [nfsiod]
+root      2360     1  0 18:13 ?        00:00:00 /usr/sbin/rpc.idmapd
+root      2649     1  0 18:13 ?        00:00:00 /usr/sbin/rsyslogd
+root      2684     1  0 18:13 ?        00:00:00 /usr/sbin/acpi_fakekeyd
+message+  2697     1  0 18:13 ?        00:00:00 /usr/bin/dbus-daemon --system
+root      2720     1  0 18:13 ?        00:00:00 /usr/sbin/NetworkManager
+root      2742     1  0 18:13 ?        00:00:00 /usr/lib/policykit-1/polkitd --no-debug
+root      2747     1  0 18:13 ?        00:00:00 /usr/sbin/acpid
+root      3002     1  0 18:13 ?        00:00:00 /usr/sbin/modem-manager
+root      3004     1  0 18:13 ?        00:00:00 /sbin/wpa_supplicant -u -s -O /var/run/wpa_supplicant
+root      3010     1  0 18:13 ?        00:00:00 /usr/sbin/apache2 -k start
+www-data  3014  3010  0 18:13 ?        00:00:00 /usr/sbin/apache2 -k start
+www-data  3015  3010  0 18:13 ?        00:00:00 /usr/sbin/apache2 -k start
+www-data  3016  3010  0 18:13 ?        00:00:00 /usr/sbin/apache2 -k start
+www-data  3017  3010  0 18:13 ?        00:00:00 /usr/sbin/apache2 -k start
+www-data  3018  3010  0 18:13 ?        00:00:00 /usr/sbin/apache2 -k start
+www-data  3019  3010  0 18:13 ?        00:00:00 /usr/sbin/apache2 -k start
+daemon    3049     1  0 18:13 ?        00:00:00 /usr/sbin/atd
+avahi     3074     1  0 18:13 ?        00:00:00 avahi-daemon: running [acerino.local]
+avahi     3075  3074  0 18:13 ?        00:00:00 avahi-daemon: chroot helper
+root      3098     1  0 18:13 ?        00:00:00 /usr/sbin/bluetoothd
+root      3104     2  0 18:13 ?        00:00:00 [krfcommd]
+root      3167     1  0 18:13 ?        00:00:00 /usr/sbin/cron
+root      3197     1  0 18:13 ?        00:00:00 /usr/sbin/cupsd -C /etc/cups/cupsd.conf
+root      3227     1  0 18:13 ?        00:00:00 /usr/sbin/libvirtd -d
+root      3281     1  0 18:13 ?        00:00:00 /usr/sbin/lightdm
+root      3309  3281  0 18:13 tty7     00:00:29 /usr/bin/X :10 -auth /var/run/lightdm/root/:10 -nolisten tcp vt7 -novtswitch
+root      3432     1  0 18:13 ?        00:00:00 /sbin/mdadm --monitor --pid-file /run/mdadm/monitor.pid --daemonise --scan --syslog
+root      3886     1  0 18:13 ?        00:00:00 /usr/lib/accountsservice/accounts-daemon
+root      3893     1  0 18:13 ?        00:00:00 /usr/sbin/console-kit-daemon --no-daemon
+root      4009     1  0 18:13 ?        00:00:00 /usr/lib/upower/upowerd
+root      4556  3281  0 18:14 ?        00:00:00 lightdm --session-child 12 23
+lechnerm  4567     1  0 18:14 ?        00:00:00 /usr/bin/gnome-keyring-daemon --daemonize --login
+lechnerm  4578  4556  0 18:14 ?        00:00:00 gnome-session --session gnome-fallback
+lechnerm  4607  4578  0 18:14 ?        00:00:00 /usr/bin/ssh-agent /usr/bin/dbus-launch --exit-with-session gnome-session-fallback
+lechnerm  4610     1  0 18:14 ?        00:00:00 /usr/bin/dbus-launch --exit-with-session gnome-session-fallback
+lechnerm  4611     1  0 18:14 ?        00:00:00 /usr/bin/dbus-daemon --fork --print-pid 6 --print-address 8 --session
+lechnerm  4620  4578  0 18:14 ?        00:00:01 /usr/lib/gnome-settings-daemon/gnome-settings-daemon
+lechnerm  4629     1  0 18:14 ?        00:00:00 /usr/lib/gvfs/gvfsd
+lechnerm  4635     1  0 18:14 ?        00:00:00 /usr/bin/pulseaudio --start --log-target=syslog
+rtkit     4637     1  0 18:14 ?        00:00:00 /usr/lib/rtkit/rtkit-daemon
+lechnerm  4644     1  0 18:14 ?        00:00:00 /usr/lib/gvfs/gvfs-gdu-volume-monitor
+root      4646     1  0 18:14 ?        00:00:00 /usr/lib/udisks/udisks-daemon
+root      4647  4646  0 18:14 ?        00:00:00 udisks-daemon: polling /dev/sr0
+lechnerm  4653     1  0 18:14 ?        00:00:00 /usr/lib/gvfs/gvfs-gphoto2-volume-monitor
+lechnerm  4655     1  0 18:14 ?        00:00:00 /usr/lib/gvfs/gvfsd-burn --spawner :1.6 /org/gtk/gvfs/exec_spaw/1
+lechnerm  4659     1  0 18:14 ?        00:00:00 /usr/lib/gvfs/gvfs-afc-volume-monitor
+colord    4662     1  0 18:14 ?        00:00:00 /usr/lib/i386-linux-gnu/colord/colord
+lechnerm  4663  4578  0 18:14 ?        00:00:02 /usr/bin/metacity
+lechnerm  4673     1  0 18:14 ?        00:00:00 /usr/lib/gnome-settings-daemon/gsd-printer
+lechnerm  4676  4578  0 18:14 ?        00:00:02 gnome-panel
+lechnerm  4696     1  0 18:14 ?        00:00:00 /usr/lib/i386-linux-gnu/gconf/gconfd-2
+lechnerm  4727     1  0 18:14 ?        00:00:00 /usr/lib/dconf/dconf-service
+lechnerm  4741  4578  0 18:14 ?        00:00:00 /usr/lib/gnome-settings-daemon/gnome-fallback-mount-helper
+lechnerm  4742  4578  0 18:14 ?        00:00:00 /usr/lib/gnome-disk-utility/gdu-notification-daemon
+lechnerm  4748  4578  0 18:14 ?        00:00:00 gnome-sound-applet
+lechnerm  4749  4578  0 18:14 ?        00:00:00 /usr/bin/python /usr/share/system-config-printer/applet.py
+lechnerm  4750  4578  0 18:14 ?        00:00:00 /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1
+lechnerm  4755  4578  0 18:14 ?        00:00:00 /usr/lib/tracker/tracker-store
+lechnerm  4760  4578  0 18:14 ?        00:00:00 /usr/lib/tracker/tracker-miner-fs
+lechnerm  4764  4578  0 18:14 ?        00:00:00 /usr/lib/notification-daemon/notification-daemon
+lechnerm  4765  4578  0 18:14 ?        00:00:01 nm-applet
+lechnerm  4774  4578  0 18:14 ?        00:00:00 gnome-screensaver
+lechnerm  4792     1  0 18:14 ?        00:00:08 /usr/bin/gnome-terminal
+lechnerm  4796  4792  0 18:14 ?        00:00:00 gnome-pty-helper
+lechnerm  4797  4792  0 18:14 pts/3    00:00:00 bash
+lechnerm  4807     1  0 18:14 ?        00:00:00 /usr/lib/telepathy/mission-control-5
+lechnerm  4848     1  0 18:14 ?        00:00:00 /usr/lib/gnome-online-accounts/goa-daemon
+Debian-+  4920     1  0 18:14 ?        00:00:00 /usr/sbin/exim4 -bd -q30m
+root      5074     1  0 18:15 ?        00:00:00 /usr/sbin/pptpd
+root      5158     2  0 18:15 ?        00:00:00 [lockd]
+root      5159     2  0 18:15 ?        00:00:00 [nfsd4]
+root      5160     2  0 18:15 ?        00:00:00 [nfsd4_callbacks]
+root      5161     2  0 18:15 ?        00:00:00 [nfsd]
+root      5162     2  0 18:15 ?        00:00:00 [nfsd]
+root      5163     2  0 18:15 ?        00:00:00 [nfsd]
+root      5164     2  0 18:15 ?        00:00:00 [nfsd]
+root      5165     2  0 18:15 ?        00:00:00 [nfsd]
+root      5166     2  0 18:15 ?        00:00:00 [nfsd]
+root      5167     2  0 18:15 ?        00:00:00 [nfsd]
+root      5168     2  0 18:15 ?        00:00:00 [nfsd]
+root      5172     1  0 18:15 ?        00:00:00 /usr/sbin/rpc.mountd --manage-gids
+root      5210     1  0 18:15 ?        00:00:00 /usr/sbin/sshd
+root      5249     2  0 18:15 ?        00:00:00 [iprt]
+ntp       5284     1  0 18:15 ?        00:00:00 /usr/sbin/ntpd -p /var/run/ntpd.pid -g -u 115:123
+root      5334     1  0 18:15 tty1     00:00:00 /sbin/getty 38400 tty1
+root      5335     1  0 18:15 tty2     00:00:00 /sbin/getty 38400 tty2
+root      5336     1  0 18:15 tty3     00:00:00 /sbin/getty 38400 tty3
+root      5337     1  0 18:15 tty4     00:00:00 /sbin/getty 38400 tty4
+root      5338     1  0 18:15 tty5     00:00:00 /sbin/getty 38400 tty5
+root      5339     1  0 18:15 tty6     00:00:00 /sbin/getty 38400 tty6
+lechnerm  5345  4676  0 18:16 ?        00:00:26 iceweasel
+lechnerm  5360     1  0 18:16 ?        00:00:00 /usr/lib/at-spi2-core/at-spi-bus-launcher
+root      5450     2  0 18:32 ?        00:00:00 [kworker/0:3]
+lechnerm  5624  4797  0 18:48 pts/3    00:00:01 gedit IntroAdmin_tp02.txt
+root      5674     2  0 18:53 ?        00:00:00 [kworker/0:1]
+lechnerm  5699  4792  0 18:55 pts/0    00:00:00 bash
+root      5804     2  0 18:59 ?        00:00:00 [kworker/0:2]
+lechnerm  5923  4797  0 19:04 pts/3    00:00:00 ps -ef
