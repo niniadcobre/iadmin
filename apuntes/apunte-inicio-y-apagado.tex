@@ -1,0 +1,403 @@
+
+\documentclass[12pt]{article}
+
+\usepackage{apuntes-estilo}
+\usepackage{fancyhdr,lastpage}
+\usepackage{color,colortbl}
+
+
+
+\def\maketitle{
+
+% Titulo 
+ \makeatletter
+ {\color{bl} \centering \huge \sc \textbf{
+Inicio y Apagado de un Sistema GNU/Linux \\ 
+%  \large \vspace*{-8pt} \color{black} Vim el Editor de Seis Billones de Dólares
+ \vspace*{8pt} }\par}
+ \makeatother
+
+
+% Autor
+ \makeatletter
+ {\centering \small 
+ 	Departamento de Ingeniería de Computadoras \\
+ 	Facultad de Informática - Universidad Nacional del Comahue \\
+ 	\vspace{20pt} }
+ \makeatother
+
+}
+
+% Custom headers and footers
+\fancyhf{} % clear all header and footer fields
+\fancypagestyle{plain}{\fancyhf{}}
+  	\pagestyle{fancy}
+ 	\lhead{\footnotesize Inicio y Apagado de un Sistema GNU/Linux - Departamento de Ingeniería de Computadoras}
+ 	\rhead{\footnotesize \thepage\ }	% "Page 1 of 2"
+
+\def\ti#1#2{\texttt{#1} & #2 \\ }
+
+
+
+\begin{document}
+
+\thispagestyle{empty}
+\maketitle
+\setlength{\parindent}{0pt}
+
+
+\begin{abstract}
+ En esta sección se explica lo que sucede en un sistema GNU/Linux al momento
+de encender o apagar la computadora, y de cómo debe hacerse apropiadamente. Si
+no se sigue el procedimiento adecuado, los archivos se pueden dañar o perder.
+\end{abstract}
+
+
+
+\section{Una introducción al proceso de inicio y finalización del sistema}
+
+El acto de  encender una computadora y cargar su sistema operativo 
+se le llama en Inglés \textit{booting}. El nombre viene de
+la idea del computador iniciándose a sí mismo sin ayuda. Si bien las particularidades
+del proceso varían dependiendo del hardware que estemos contemplando, hay ciertas
+fases generales que aplican cualquiera sea este. 
+
+Cuando se enciende una computadora, esta ejecuta un código fijo almacenado en una 
+memoria no volátil (que no pierde su contenido cuando el hardware no está energizado) en la 
+placa base. Este código intentará deducir dónde se encuentra
+la siguiente porción de software a ejecutar, que permitirá en última instancia 
+cargar el sistema operativo y comenzar a ejecutarlo. Este código inicial es muy pequeño 
+y sencillo por lo 
+que usualmente es necesario software adicional para completar la carga del sistema. 
+
+En este apunte en particular describiremos el proceso de arranque de un sistema 
+GNU/Linux instalado en una computadora personal típica. La elección se debe a que 
+este es el tipo de hardware con el que el lector se encontrará con mas frecuencia 
+durante esta etapa.  
+
+ Al finalizar un sistema Linux (shutdown), se le ordena a cada proceso
+terminar. Esto causa que los archivos sean cerrados y que se realicen otras
+tareas que sirven para mantener el sistema en orden. A continuación se desmontan
+los sistemas de archivos y las áreas de intercambio\footnote{Sección de disco utilizada 
+para implementar la memoria virtual del sistema}. Finalmente, se muestra un mensaje
+en la consola indicando que el equipo puede apagarse o bien se apaga automáticamente. 
+Si no se sigue el procedimiento anterior pueden y sucederán cosas terribles. Uno de los problemas 
+que puede ocurrir por ejemplo, es que el buffer caché
+\footnote{La lectura desde el disco es mas lenta en comparación con el acceso a 
+memoria primaria o RAM. Además, es común leer la misma parte del disco varias 
+veces durante periodos relativamente cortos de tiempo. Leyendo la información del
+disco una sola vez y luego manteniéndola en la memoria hasta que no sea necesaria,
+puede acelerar todas las lecturas posteriores con respecto a la primera. Esto es 
+llamado ``buffering'' de disco (disk buffering), y la memoria usada para ese propósito 
+es llamada buffer cache.}
+ del sistema de archivos no sea escrito a
+disco (o a su medio de almacenamiento correspondiente), lo que significa que los
+datos contenidos en él se pierdan y que por lo tanto la información contenida en
+el sistema de archivos del disco sea inconsistente y posiblemente inutilizable.
+
+\section{Más acerca del arranque de GNU/Linux}
+
+Al encender una computadora, en lo que se denomina un arranque en frío, esta se
+comprueba a sí misma usando un código que se denomina POST (Power On Self
+Test). El objetivo de dicha prueba es verificar que los elementos imprescindibles
+para su funcionamiento están presentes y disponibles (la memoria RAM, por
+ejemplo). Dados los escasos recursos con los que cuenta un ordenador
+al que pudieran fallarle partes muy básicas, los fallos suelen ser notificados al
+usuario por medio de indicaciones sonoras a través de un pequeño altavoz que
+suele llevar la placa base, usando secuencias de pitidos predeterminadas para
+cada tipo de fallo; en otros casos serán el parpadeo de ciertas luces indicadoras
+lo que indiquen el tipo de fallo. 
+
+Si la prueba POST se pasa con éxito, se ejecuta a continuación un programa
+denominado ``bootstrap loader'' (cargador de inicio) que reside en la memoria de la
+BIOS (del inglés ``Basic Input Output System''). El objetivo de este programa 
+es encontrar un \textit{sector de arranque} en alguno de
+los dispositivos de almacenamiento disponibles (antes tan sólo discos rígidos o
+flexibles, pero hoy en día es posible arrancar de prácticamente cualquier dispositivo
+de almacenamiento: llaves USB, tarjetas CF -Compact Flash- que pueda
+montarse como disco, o incluso desde una red local).
+Un \textit{sector de arranque} es el primer sector de un disco y contiene un pequeño
+programa  que es capaz de cargar un Sistema Operativo. Al \textit{sector de arranque} 
+se lo conoce  en inglés como \textit{boot sector} o
+\textit{master boot record} (MBR o sector de arranque maestro). Si
+el disco contiene varias particiones, cada una de ellas tiene su propio sector
+de arranque (primer sector de cada partición).  
+
+El cargador de inicio tiene una lista de lugares en las que buscar un sector de
+arranque. Esto es lo que se programa cuando en la BIOS seleccionamos los dispositivos
+de los que arrancar y su orden.
+
+El pequeño programa que se ejecuta desde el sector de arranque puede ser de
+varios tipos, y es lo suficientemente pequeño para que quepa en un único sector, 
+cuya responsabilidad será la de leer el sistema operativo desde el disco, cargarlo 
+en memoria y ponerlo en ejecución. En el caso de GNU/Linux, uno de los más famosos fue LILO
+\footnote{Debido a su sencillez y eficiencia muchos administradores siguen 
+optando por LILO}, sin embargo 
+hace tiempo que muchas distribuciones utilizan de modo predeterminado un cargador alternativo,
+llamado GRUB (mucho mas complejo pero a la vez más potente que LILO). Otros Sistemas Operativos 
+tienen su propio programa cargador.
+
+Usaremos LILO en la descripción, pues es más ilustrativo.
+En el caso concreto de LILO, el sector de arranque carga una parte
+de éste, denominada ``first stage boot loader'' (primer paso del cargador de inicio).
+Su misión es cargar y ejecutar el segundo paso del cargador de inicio.
+Esta segunda parte suele mostrar una selección de Sistemas Operativos a cargar,
+procediendo luego a cargar el sistema seleccionado por el usuario (o bien el
+que se haya configurado como sistema predeterminado, tras un tiempo de espera). 
+Esta información está incluida dentro del cargador de inicio
+y, para introducirla, se usa el comando \texttt{lilo} que a su vez usa el contenido del
+archivo \texttt{/etc/lilo.conf}. Todo ello sucede, por supuesto, con el ordenador ya en marcha.
+
+Una vez que LILO ha cargado el ``kernel'' (núcleo) Linux, le transfiere el control a éste.
+El kernel Linux luego de que ha sido cargado en memoria y comienza a
+ejecutarse, inicializa el hardware y los controladores de los dispositivos. 
+Adicionalmente el kernel recibe algunos parámetros durante su carga. De éstos, 
+uno de los más importantes es el que le dice al núcleo qué dispositivo usar 
+como sistema de ficheros raíz, es decir, lo
+que en UNIX se denomina ``/''. En una computadora personal típica, la raíz sería
+una partición de un disco rígido. 
+
+Si el núcleo ha conseguido montar el sistema de ficheros raíz, lo siguiente a
+ejecutar es el programa ``\texttt{init}'' (para más detalle \texttt{man 8 init}). 
+En general, ``\texttt{init}'' es sólo el programa que se encarga de arrancar el resto de
+procesos que la máquina debe ejecutar. Entre sus tareas está el comprobar y
+montar sistemas de archivos adicionales, así como iniciar programas servidores (daemons)
+para cada función necesaria. Otra tarea importante es la de ejecutar procesos
+``\texttt{getty}'' cuya misión es proporcionar consolas donde poder iniciar sesión en el
+sistema. Las ordenes a seguir por \texttt{init} están en el fichero \texttt{/etc/inittab}. 
+A partir de
+ese punto, y en función del sistema de inicialización utilizado (el más frecuente es
+el denominado ``System V'') el proceso seguido por \texttt{init} es distinto, pero en el
+fondo obedece más a un factor de forma, es decir, a una estrategia de
+ordenamiento de los ``scripts'' de inicialización de los distintos procesos que a un
+factor de fondo.
+
+Una vez iniciados todos los servicios y procesos de entrada de usuario, o bien
+estamos delante de una consola de texto en la que el ordenador nos pide que nos
+identifiquemos, o bien estamos ante una consola gráfica que nos pide lo mismo, o
+bien estamos ante una pantalla llena de opciones sobre qué ejecutar (escuchar
+música, ver películas, por ejemplo) si el sistema arranca bajo un usuario
+predeterminado y no nos pide iniciar sesión explícitamente.
+
+La siguiente es la salida por pantalla de una secuencia de arranque, en 
+la que se observa el gestor de arranque LILO y algunas comprobaciones de 
+hardware realizadas luego de la carga del kernel Linux: 
+
+\colorbox{grey}{\parbox[t]{0.95\linewidth}{ \vspace*{0.5cm} {\tt 
+LILO boot: \\
+Loading linux. \\
+Console: colour EGA+ 80x25, 8 virtual consoles \\
+Serial driver version 3.94 with no serial options enabled \\
+tty00 at 0x03f8 (irq = 4) is a 16450 \\
+tty01 at 0x02f8 (irq = 3) is a 16450 \\
+lp\_init: lp1 exists (0), using polling driver \\
+Memory: 7332k/8192k available (300k kernel code, 384k reserved, 176k \\
+data)
+Floppy drive(s): fd0 is 1.44M, fd1 is 1.2M \\
+Loopback device init \\
+Warning WD8013 board not found at i/o = 280. \\
+Math coprocessor using irq13 error reporting. \\
+Partition check: \\
+  hda: hda1 hda2 hda3 \\
+VFS: Mounted root (ext filesystem). \\
+Linux version 0.99.pl9-1 (root@haven) 05/01/93 14:12:20
+ } \vspace*{0.5cm} } } 
+
+
+El idioma y la forma exacta del texto es diferente en cada sistema, en función
+del hardware instalado, la versión de Linux que se está utilizando y como se ha
+establecido la configuración del sistema.
+
+
+
+\section{ Más acerca del apagado (shutdown)}
+
+ Es sumamente importante comprender y seguir los pasos correctos al
+momento de finalizar un sistema GNU/Linux. Si no realiza este procedimiento, es 
+probable que sus sistemas de archivos se vean perjudicados. Esto sucede porque Linux 
+tiene un cache de disco que no escribe a disco cada vez que se le solicita, sino 
+que solamente lo hace a intervalos. Esta manera de proceder mejora de manera 
+significativa el desempeño del sistema, pero al mismo tiempo significa que si se 
+apaga el equipo de imprevisto puede perder información que debería estar en 
+sus sistemas de archivos (y obviamente en sus discos). Esto último sucede porque la cache puede
+contener una gran cantidad de datos que se pierden con el apagado, y lo que está
+en el disco puede no ser un sistema de archivos totalmente funcional (debido a
+que solamente parte de la información ha sido transcrita de la cache al disco
+duro).  
+
+ Una razón adicional para no desconectar directamente el sistema de la
+energía (presionando por ej. el botón de apagado) es que en un ambiente
+multitarea y multiusuario (también conocido como tiempo compartido) existen 
+diversos procesos que se están ejecutando en segundo plano, y
+desconectar la computadora en este momento puede ser desastroso. Utilizando el
+procedimiento correcto para el apagado del equipo garantiza que todos los
+procesos en segundo plano puedan guardar sus datos.  
+
+ El comando para finalizar correctamente un sistema GNU/Linux es
+\texttt{\textbf{shutdown}}. Se utiliza generalmente de una de las 
+siguiente maneras: 
+
+ Si Ud. es el único usuario del sistema, entonces debe finalizar todos los
+programas que estén en ejecución, finalizar todas las sesiones (log out) de
+todas las consolas virtuales, e iniciar una sesión como usuario root, y 
+ejecutar el comando \texttt{\textbf{shutdown -h now}}. Si
+desea postergar durante algún lapso el comando shutdown, reemplace
+\texttt{now} con un signo + (mas) y un número que indica minutos de
+espera.  
+
+ Alternativamente, si el sistema está siendo utilizado por muchos
+usuarios, utilice el comando shutdown -h +time mensaje, donde time es el número
+de minutos en que se posterga la detención del sistema, y el mensaje es una
+explicación breve de el por qué se está apagando el sistema.
+
+\colorbox{grey}{\parbox[t]{0.95\linewidth}{ \vspace*{0.5cm} 
+{\tt
+\# shutdown -h +10 'Instalaremos un nuevo disco. El sistema  \\
+estará funcional en aproximadamente tres horas.' \\
+\#
+} \vspace*{0.5cm} } } 
+
+El ejemplo advierte a todos los usuarios que el sistema se apagará en diez
+minutos, y que sería mejor que se desconectaran o se arriesgan a perder la
+información con la que están trabajando. La advertencia se muestra en cada
+terminal donde existe un usuario conectado, incluyendo los emuladores de
+terminales para el sistema X Window. 
+
+
+
+\colorbox{grey}{\parbox[t]{0.95\linewidth}{ \vspace*{0.5cm} 
+{\tt  Broadcast message from root (ttyp0) Wed Aug  2 01:03:25 1995... \\
+Instalaremos un nuevo disco. El sistema estará funcional \\
+en aproximadamente tres horas.  The system is going DOWN for system halt \\
+in 10 minutes !!   } \vspace*{0.5cm} } } 
+
+
+El mensaje de advertencia (warning)
+se repite automáticamente varias veces antes de pagar la máquina con
+intervalos cada vez más frecuentes.
+
+ Después del tiempo de postergación, cuando el proceso de apagado real
+empieza, se desmontan todos los sistemas de archivos (excepto el sistema de
+archivos raíz /), se finalizan (kill) los procesos de los usuarios (si existen
+aún usuarios dentro del sistema), los demonios y finalmente se desmonta el
+sistema de archivos raíz. Cuando todo este proceso finaliza,
+\texttt{\textbf{init}} muestra un mensaje indicando que se puede apagar la
+máquina. Es entonces y sólo entonces que es posible bajar el switch o
+interruptor de suministro eléctrico, si es que no se hace automáticamente.
+
+ Algunas veces, aunque es raro en un buen sistema, es imposible concluir
+el sistema de forma adecuada. Por ejemplo, si ocurre un error fatal con el
+kernel, puede ser imposible ejecutar cualquier comando nuevo, haciendo la
+finalización normal del sistema inviable. Todo lo que se puede hacer en este
+caso es esperar que ningún daño severo ocurra y entonces desconectar la máquina.
+
+
+\section{ Reinicio (Rebooting)}
+
+ Rebooting significa iniciar el sistema nuevamente. Se puede realizar
+finalizando el sistema, apagando la máquina y entonces encendiendo nuevamente. Un
+método más práctico para tener el mismo efecto consiste en indicarle al comando
+\texttt{\textbf{shutdown}} que reinicie el sistema, en vez de que lo detenga.
+La opción \texttt{-r} del comando \texttt{\textbf{shutdown}} puede
+realizar la acción anterior, y puede utilizarse inmediatamente, por ejemplo:
+\texttt{\textbf{shutdown -r now}}.  
+
+ La mayoría de los sistemas GNU/Linux ejecutan el comando \texttt{\textbf{shutdown -r
+now}} cuando se oprime la combinación de teclas \texttt{ctrl-alt-del} (y
+reinician el equipo). La manera de operar de \texttt{ctrl-alt-del} se puede configurar y
+es una buena idea postergar la acción durante algún tiempo antes de reiniciar
+una máquina multiusuario. Los sistemas en los que cualquier persona puede
+acceder físicamente es conveniente configurar \texttt{ctrl-alt-del} para que no haga
+nada.
+
+En algunos Linux también logramos el mismo efecto con el comando reboot.
+
+\section {Niveles de ejecución}
+
+
+Luego de que de que el proceso \texttt{init} es ejecutado por el kernel, comienza 
+la ejecución de servicios y procesos que resultarán finalmente en un sistema 
+completamente funcional. Este proceso también involucra una serie de etapas bien 
+definidas, es un proceso escalonado, no inmediato. Por ejemplo para que un servicio de página web 
+este disponible para su uso, es necesario que previamente 
+se haya configurado la red. Lo mismo sucede durante el apagado, antes de 
+eliminar el servicio de red, es conveniente que las aplicaciones que 
+utilizan dicho servicio finalicen. Estas etapas definen lo que se conoce como 
+\textit{\textbf{niveles de ejecución}}.
+
+Un nivel de ejecución es una configuración de software del sistema que permite 
+existir sólo a un grupo de procesos seleccionado. Los procesos levantados por 
+\texttt{init} para cada uno de estos niveles de ejecución se definen en el archivo 
+\texttt{/etc/inittab}. Para más detalle lea la página del manual en línea 
+correspondiente a inittab (\texttt{man inittab}).
+ 
+Un nivel de ejecución es un estado de \texttt{init} y de la totalidad del 
+sistema, y define qué servicios están operando en un momento particular. Los 
+niveles de ejecución son identificados por números (observe la tabla a continuación). 
+
+\definecolor{tcA}{rgb}{1,0.92549,0.678431}
+\begin{center}
+\begin{tabular}{|c|c|}\hline
+% use packages: color,colortbl
+\rowcolor{tcA}
+\textbf{Número de nivel} & \textbf{Función del nivel}\\\hline
+0 & Parar el sistema\\\hline
+1 & Modo de usuario individual (para tareas especiales de administración).\\\hline
+2-5 & Operación normal (definidas para los usuarios).\\\hline
+6 & Reiniciar el sistema.\\\hline
+\end{tabular}
+\end{center}
+
+No existe aún un consenso de cómo utilizar los niveles de ejecución definidos 
+para usuarios (2 a 5). Algunos administradores  
+de sistemas utilizan estos niveles de ejecución para definir cuales subsistemas están trabajando, 
+por ejemplo, podría definirse que el nivel de ejecución cinco este asociado al entorno gráfico, 
+de modo que cuando se pide al sistema iniciar la transición hacia el nivel cinco, el sistema 
+iniciará los servicios requeridos para iniciar el entorno gráfico (X, gdm, gnome, etc.). Esta 
+estrategia evita tener que realizar estas tareas manualmente cada vez que, por ejemplo 
+se reinicia la computadora.  
+
+Los comandos \texttt{runlevel} o \texttt{who -r}, entre otros, nos permiten 
+identificar en qué nivel de ejecución se encuentra actualmente el sistema. 
+De este modo un administrador de sistemas puede saber cuáles son los servicios
+que debieran estar operativos. 
+
+Los detalles sobre el modo particular en que cada distribución GNU/Linux, 
+asocia y ejecuta los servicios en cada nivel de ejecución, está fuera 
+del alcance de este curso. Sólo mencionaremos que, en la actualidad 
+la mayoría de las distribuciones utiliza lo que se conoce como
+\textit{\textbf{System V init scripts}} que básicamente consiste en 
+un conjunto de scripts asociados a cada nivel de ejecución, que se ejecutan 
+en un orden particular cada vez que el sistema inicia una transición 
+hacia ese nivel de ejecución (por ejemplo al invocar el comando shutdown 
+o al encender la computadora). También existen otros esquemas como 
+\textit{\textbf{Systemd}} desarrollado por freedesktop.org y utilizado por
+muchas distribuciones en sus versiones más recientes, como ser Debian, Ubuntu, 
+Suse y Fedora entre otras. 
+
+En particular \textit{Systemd} reemplaza el concepto de ``nivel de ejecución'' por 
+``target unit''. Nace debido a la necesidad de agilizar el arranque del sistema (en 
+cierta medida por la explosión de equipos móviles que corren bajo Linux); la 
+especificación de dependencias más complejas entre servicios, entre otras razones.  
+Esta fuera del alance de este curso un análisis completo de Systemd, para más 
+información referirse a freedesktop.org. 
+
+\subsection{ Modo usuario individual (single user mode)}
+
+ El comando \texttt{\textbf{shutdown}} también se puede utilizar para
+cambiar el nivel de ejecución del sistema. En particular nos interesa el 
+cambio al nivel de modo de usuario individual
+(single user), en el cual nadie puede iniciar una sesión de usuario, pero root
+puede utilizar la consola. Es útil para efectuar tareas de administración del
+sistema que no se pueden realizar cuando el sistema se ejecuta normalmente.
+
+ El monousuario o usuario individual garantiza al administrador la existencia 
+de un conjunto de servicios mínimos para realizar tareas administrativas sin 
+la interferencia de servicios no esenciales. Por ejemplo, podría definirse que 
+en este nivel de ejecución, los servicios de red (y por ende todos los servicios
+que lo utilizan) se encuentren apagados, de modo que la única forma de 
+acceso sea a través de la consola. 
+
+\include{licGASL}
+
+\end{document}

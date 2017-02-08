@@ -1,0 +1,676 @@
+%%% LaTeX Template: Article/Thesis/etc. with colored headings and special fonts
+%%%
+%%% Source: http://www.howtotex.com/
+
+\documentclass[12pt]{article}
+
+
+\usepackage{apuntes-estilo}
+\usepackage{fancyhdr,lastpage}
+\usepackage{color,colortbl}
+
+
+
+\def\maketitle{
+
+% Titulo 
+ \makeatletter
+ {\color{bl} \centering \huge \sc \textbf{
+Archivos, tipos y atributos \\
+\large \vspace*{-8pt} \color{black} Una introducción a las atributos de archivos en GNU/Linux
+ \vspace*{8pt} }\par}
+ \makeatother
+
+
+% Autor
+ \makeatletter
+ {\centering \small 
+ 	Departamento de Ingeniería de Computadoras \\
+ 	Facultad de Informática - Universidad Nacional del Comahue \\
+ 	\vspace{20pt} }
+ \makeatother
+
+}
+
+% Custom headers and footers
+\fancyhf{} % clear all header and footer fields
+\fancypagestyle{plain}{\fancyhf{}}
+  	\pagestyle{fancy}
+ 	\lhead{\footnotesize Archivos, tipos y atributos - Departamento de Ingeniería de Computadoras}
+ 	\rhead{\footnotesize \thepage\ }	% "Page 1 of 2"
+
+\def\ti#1#2{\texttt{#1} & #2 \\ }
+
+
+
+\begin{document}
+
+\thispagestyle{empty}
+\maketitle
+\setlength{\parindent}{0pt}
+
+
+\section*{Introducción}
+Este documento describe los conceptos básicos sobre propiedades de archivos, 
+incluyendo tipos y permisos de archivos, propietarios y grupos. 
+
+\section*{Tipos de archivos}
+
+Un archivo es una secuencia de bytes (un byte es un pequeño trozo de 
+información, normalmente compuesto por ocho bits. Para nuestros propósitos
+durante este texto, un byte es equivalente a un caracter). El sistema no impone 
+estructura alguna a los archivos, ni asigna significado a su contenido; el 
+significado de los bytes depende únicamente de los programas que 
+interpretan el archivo. 
+
+Vimos en apuntes anteriores que los archivos se organizan dentro de sistemas de 
+archivos (ext3, ext4,NTFS, etc). Estos sistemas de archivos son el modo de 
+ordenar los archivos dentro de los distintos medios de almacenamiento (discos
+rígidos, de estado sólido, memorias flash, etc). 
+
+En general, la mayoría de los sistemas de archivos de sistemas de tipo UNIX
+definen seis tipos de archivos:
+
+\begin{itemize}
+\item Archivos regulares (Ej. un archivo de texto, un pdf son archivos regulares)
+\item Directorios
+\item Links simbólicos
+\item Dispositivos (de bloque y caracter) 
+\item UNIX Sockets  
+\item Pipes 
+\end{itemize}
+
+Limitaremos nuestro estudio a los tres primeros tipos de archivos. 
+
+
+\subsection*{Archivos regulares}
+No son otra cosa que una bolsa de bytes: UNIX no impone ninguna estructura a
+su contenido. Los archivos de texto, de datos, programas ejecutables, bibliotecas
+compartidas, son todos archivos regulares.
+
+La creación de archivos regulares sucede a través de distintos programas de 
+aplicación, por ejemplo cuando utilizamos un software de ofimática, cuando 
+descargamos archivos del email, a través de un editor de texto, etc. El formato 
+interno de archivos regulares dependerá entonces de la aplicación que lo creó. 
+
+La eliminación de archivos regulares sucede a través del comando \texttt{rm}. 
+
+\subsection*{Directorios}
+Los directorios son archivos que contienen referencias a otros archivos. 
+Podemos crear directorios a través del comando \texttt{mkdir}, y eliminarlos
+a través del comando \texttt{rmdir} si está vacío, o \texttt{rm -r} si tiene 
+contenido. 
+
+La estructura de un archivo de tipo directorio dependerá del sistema de 
+archivos que usemos en particular. En general las entradas ``.'' y ``..''
+se refieren al directorio actual o su padre respectivamente.  
+
+\fcolorbox{black}{grey}{
+\parbox[t]{1.0\linewidth}{ \vspace*{0.4cm}
+{\bf Ejemplo} \\
+\texttt{ 
+\$ mkdir dir1 \\
+\$ cd dir1\/ \\
+\$ pwd \\
+/home/lechnerm/test/dir1 \\
+\$ touch arch\_dir1.txt  \\
+\$ ls -l . \\
+total 0 \\
+-rw-r--r-- 1 lechnerm lechnerm 0 abr  4 20:06 arch\_dir1.txt \\
+\$ mkdir dir2  \\
+\$ cd dir2/ \\
+\$ pwd \\
+/home/lechnerm/test/dir1/dir2 \\
+\$ touch arch\_dir2.txt \\
+\$ ls -la . \\
+total 8 \\
+drwxr-xr-x 2 lechnerm lechnerm 4096 abr  4 20:07 . \\
+drwxr-xr-x 3 lechnerm lechnerm 4096 abr  4 20:07 .. \\
+-rw-r--r-- 1 lechnerm lechnerm    0 abr  4 20:07 arch\_dir2.txt \\
+\$ ls -la .. \\
+total 12 \\
+drwxr-xr-x 3 lechnerm lechnerm 4096 abr  4 20:07 . \\
+drwxr-xr-x 3 lechnerm lechnerm 4096 abr  4 20:06 .. \\
+-rw-r--r-- 1 lechnerm lechnerm    0 abr  4 20:06 arch\_dir1.txt \\
+drwxr-xr-x 2 lechnerm lechnerm 4096 abr  4 20:07 dir2 \\
+\$ 
+}
+
+Nota: el comando \texttt{touch} crea un archivo regular vacío (o bytes). 
+\vspace*{0.4cm} } }
+
+
+Los \textit{nombres de archivos} contenidos dentro de un directorio, se encuentran 
+almacenados en el directorio y no en el archivo en sí mismo. Esto permite, entre otras
+cosas, que un mismo archivo tenga varios nombres distintos \textit{dentro del mismo 
+sistema de archivos}. Cada nombre es sólo una referencia, el contenido del archivo 
+será el mismo cualquiera sea el nombre que usemos para accederlo. Esto es conocido
+como ``hard link''. No debe confundirse un \textit{hard link} con una copia de archivo
+por ejemplo creada a través del comando \texttt{cp}. 
+
+Un \textit{hard link} se crea a  través del comando \texttt{ln} y se elimina igual 
+que cualquier otro archivo regular, a través de el comando \texttt{rm}. 
+
+\fcolorbox{black}{grey}{
+\parbox[t]{1.0\linewidth}{ \vspace*{0.4cm}
+{\bf Ejemplo} \\
+\texttt{
+\$ ls lunes.txt  \\
+ls: no se puede acceder a lunes.txt: No existe el fichero o el directorio \\
+\$ echo Hoy es lunes  \textgreater  lunes.txt  \\
+\$ cat lunes.txt  \\
+Hoy es lunes \\
+\$ ls martes.txt \\
+ls: no se puede acceder a martes.txt: No existe el fichero o el directorio \\
+\$ ln lunes.txt martes.txt \\
+\$ cat martes.txt  \\
+Hoy es lunes \\
+\$ echo Hoy es martes \textgreater \textgreater  martes.txt  \\
+\$ cat lunes.txt  \\
+Hoy es lunes \\
+Hoy es martes \\
+\$ rm lunes.txt  \\
+\$ ls lunes.txt \\
+ls: no se puede acceder a lunes.txt: No existe el fichero o el directorio \\
+\$ cat martes.txt  \\
+Hoy es lunes \\
+Hoy es martes \\
+\$  
+}
+\vspace*{0.4cm} } }
+
+El sistema de archivos mantendrá la cuenta de los ``hard links'' que existen 
+a un mismo archivo, decrementando el valor cada vez que se elimina una de las 
+referencias, por ejemplo a través del comando \texttt{rm}. Sólo se liberará el espacio 
+utilizado por el archivo cuando éste sea la última referencia. Podemos ver el 
+número de referencias a un archivo con el comando \texttt{stat} o el segundo campo 
+en la salida del comando \texttt{ls -l}.  
+
+\fcolorbox{black}{grey}{
+\parbox[t]{1.0\linewidth}{ \vspace*{0.4cm}
+{\bf Ejemplo} \\
+\texttt{
+\$ cat martes.txt  \\
+Hoy es lunes \\
+Hoy es martes \\
+}
+\vspace*{0.4cm} } }
+
+\fcolorbox{black}{grey}{
+\parbox[t]{1.0\linewidth}{ \vspace*{0.4cm}
+\texttt{
+\$ stat martes.txt  \\
+  Fichero: «martes.txt» \\
+  Tamaño: 27        	Bloques: 8          Bloque E/S: 4096   fichero regular \\
+Dispositivo: fe01h/65025d	Nodo-i: 5638106    \textbf{Enlaces: 1} \\
+Acceso: (0644/-rw-r--r--)  Uid: ( 1000/lechnerm)   Gid: ( 1000/lechnerm) \\
+      Acceso: 2014-04-05 15:22:18.812061851 -0300 \\
+Modificación: 2014-04-05 15:21:12.881692767 -0300 \\
+      Cambio: 2014-04-05 15:22:13.716187888 -0300 \\
+    Creación: - \\
+\$ ln martes.txt lunes.txt  \\
+\$ stat martes.txt  \\
+  Fichero: «martes.txt» \\
+  Tamaño: 27        	Bloques: 8          Bloque E/S: 4096   fichero regular \\
+Dispositivo: fe01h/65025d	Nodo-i: 5638106    \textbf{Enlaces: 2} \\
+Acceso: (0644/-rw-r--r--)  Uid: ( 1000/lechnerm)   Gid: ( 1000/lechnerm) \\
+      Acceso: 2014-04-05 16:03:39.991411489 -0300 \\
+Modificación: 2014-04-05 15:21:12.881692767 -0300 \\
+      Cambio: 2014-04-05 16:03:36.739495849 -0300 \\
+    Creación: - \\
+\$ stat lunes.txt  \\
+  Fichero: «lunes.txt» \\
+  Tamaño: 27        	Bloques: 8          Bloque E/S: 4096   fichero regular \\
+Dispositivo: fe01h/65025d	Nodo-i: 5638106     \textbf{Enlaces: 2} \\
+Acceso: (0644/-rw-r--r--)  Uid: ( 1000/lechnerm)   Gid: ( 1000/lechnerm) \\
+      Acceso: 2014-04-05 16:03:39.991411489 -0300 \\
+Modificación: 2014-04-05 15:21:12.881692767 -0300 \\
+      Cambio: 2014-04-05 16:03:36.739495849 -0300 \\
+    Creación: - \\
+\$ rm martes.txt  \\
+\$ stat lunes.txt  \\
+  Fichero: «lunes.txt» \\
+  Tamaño: 27        	Bloques: 8          Bloque E/S: 4096   fichero regular \\
+Dispositivo: fe01h/65025d	Nodo-i: 5638106     \textbf{Enlaces: 1} \\
+Acceso: (0644/-rw-r--r--)  Uid: ( 1000/lechnerm)   Gid: ( 1000/lechnerm) \\
+      Acceso: 2014-04-05 16:03:39.991411489 -0300 \\
+Modificación: 2014-04-05 15:21:12.881692767 -0300 \\
+      Cambio: 2014-04-05 16:04:09.702640844 -0300 \\
+    Creación: - \\
+\$ 
+}
+\vspace*{0.4cm} } }
+
+Es importante entender que los ``hard link'' no son un tipo de archivos especial. 
+Simplemente el sistema de archivos permite crear múltiples referencias al 
+mismo conjunto de bytes. Tanto el contenido como todos las propiedades del archivo
+(propiedad, permisos, tiempos de acceso, etc). son compartidos entre todos los 
+``hard link''.  
+
+\subsection*{Links simbólicos}
+Un \textit{link simbólico} o ``soft link'' apunta a un \textit{nombre de archivo}.
+Es decir el contenido de un archivo de tipo link simbólico, es una ruta 
+(en inglés ``path'') a otro archivo. La diferencia entre un ``hard link'' y un 
+``soft link'' es que, el ``hard link'' es un referencia directa a un archivo, 
+mientras que un ``soft link'' es una referencia por nombre; \textit{el link simbólico
+es un archivo diferente del archivo al que apunta}.  
+
+
+Los links simbólicos se crean con el comando \texttt{ln -s} (se agrega la opción -s
+-de soft- al comando utilizado para crear hard links), y se eliminan con el comando 
+\texttt{rm}. La creación o eliminación de un link simbólico no altera la cuenta de 
+enlaces del archivo referenciado. 
+
+\fcolorbox{black}{grey}{
+\parbox[t]{1.0\linewidth}{ \vspace*{0.4cm}
+{\bf Ejemplo} \\
+\texttt{ 
+\$ ls jueves.txt \\
+ls: no se puede acceder a jueves.txt: No existe el fichero o el directorio \\
+\$ echo Hoy es jueves \textgreater jueves.txt  \\
+\$ cat jueves.txt  \\
+Hoy es jueves \\
+\$ stat jueves.txt  \\
+  Fichero: «jueves.txt» \\
+  Tamaño: 14        	Bloques: 8          Bloque E/S: 4096   fichero regular \\
+Dispositivo: fe01h/65025d	Nodo-i: 5638480     \textbf{Enlaces: 1} \\
+Acceso: (0644/-rw-r--r--)  Uid: ( 1000/lechnerm)   Gid: ( 1000/lechnerm) \\
+      Acceso: 2014-04-05 18:55:07.134982820 -0300 \\
+Modificación: 2014-04-05 18:55:01.679118415 -0300 \\
+      Cambio: 2014-04-05 18:55:01.679118415 -0300 \\
+    Creación: - \\
+\$ ln -s jueves.txt viernes.txt \\
+\$ ls -l * \\
+-rw-r--r-- 1 lechnerm lechnerm 14 abr  5 18:55 jueves.txt \\
+\textbf{lrwxrwxrwx 1 lechnerm lechnerm 10 abr  5 18:55 viernes.txt -\textgreater jueves.txt} \\
+\$ cat viernes.txt  \\
+Hoy es jueves \\
+}
+\vspace*{0.4cm} } }
+
+\fcolorbox{black}{grey}{
+\parbox[t]{1.0\linewidth}{ \vspace*{0.4cm}
+{\bf Ejemplo} \\
+\texttt{ 
+\$ stat jueves.txt viernes.txt  \\
+  Fichero: «jueves.txt» \\
+  Tamaño: 14        	Bloques: 8          Bloque E/S: 4096   fichero regular \\
+Dispositivo: fe01h/65025d	Nodo-i: 5638480     \textbf{Enlaces: 1} \\
+Acceso: (0644/-rw-r--r--)  Uid: ( 1000/lechnerm)   Gid: ( 1000/lechnerm) \\
+      Acceso: 2014-04-05 18:55:07.134982820 -0300 \\
+Modificación: 2014-04-05 18:55:01.679118415 -0300 \\
+      Cambio: 2014-04-05 18:55:01.679118415 -0300 \\
+    Creación: - \\
+  Fichero: «viernes.txt» -> «jueves.txt» \\
+  Tamaño: 10        	Bloques: 0          Bloque E/S: 4096   enlace simbólico \\
+Dispositivo: fe01h/65025d	Nodo-i: 5638483     \textbf{Enlaces: 1} \\
+Acceso: (0777/lrwxrwxrwx)  Uid: ( 1000/lechnerm)   Gid: ( 1000/lechnerm) \\
+      Acceso: 2014-04-05 18:55:40.738147781 -0300 \\
+Modificación: 2014-04-05 18:55:34.710297555 -0300 \\
+      Cambio: 2014-04-05 18:55:34.710297555 -0300 \\
+    Creación: - \\
+\$ echo Hoy es viernes \textgreater \textgreater viernes.txt  \\
+\$ cat jueves.txt  \\
+Hoy es jueves \\
+Hoy es viernes \\
+\$ rm viernes.txt  \\
+\$  
+}
+\vspace*{0.4cm} } }
+
+Al almacenar nombres de archivos los links simbólicos, a diferencia de los ``hard 
+links'', \textit{pueden hacer referencia a archivos en un sistema de archivos diferente}. A su 
+vez, estas rutas de archivos pueden ser absolutas o relativas\footnote{Una ruta absoluta
+es aquella que comienza a partir del directorio raíz /, ej. /usr/share/. Una ruta relativa
+no contiene el directorio raíz / y es relativa al directorio de trabajo actual, ej. share/}. 
+
+Es un error común pensar que el primer argumento del comando \texttt{ln -s} tiene algo que 
+ver con el directorio de trabajo actual. Este no es el caso, \texttt{ln} simplemente tomará 
+ese argumento literalmente como el destino del link simbólico. 
+
+Se debe tener en cuenta que al eliminar el archivo referenciado, el link simbólico sigue existiendo, 
+haciendo referencia a un archivo inexistente. 
+
+\subsection*{Código de tipos de archivos}
+Varios comandos del sistema GNU/Linux, como ser \texttt{ls} y \texttt{stat}, utilizan un código 
+para identificar en su salida, el tipo de archivo mostrado. La siguiente tabla muestra los 
+códigos utilizados:
+
+\definecolor{tcA}{rgb}{1,0.92549,0.623529}
+\begin{center}
+\begin{tabular}{llll}\hline
+% use packages: color,colortbl
+\rowcolor{tcA}
+Tipo de archivo & Símbolo & Creado por & Eliminado por\\\hline
+Archivo regular & - & aplicaciones,touch,cp,etc & rm\\
+Directorio & d & mkdir & rm -r, rmdir\\
+Link simbólico & l & ln -s & rm \\
+Dispositivo (caracter y bloque) & c/b & mknod & rm\\
+UNIX Sockets & s & socket(2) & rm\\
+Pipes & p & mknod & rm\\\hline
+\end{tabular}
+\end{center}
+
+\fcolorbox{black}{grey}{
+\parbox[t]{1.0\linewidth}{ \vspace*{0.4cm}
+{\bf Ejemplo} \\
+Observe el primer caracter de las salidas de \texttt{ls}, donde se distingue
+el código del tipo de archivo listado. \\
+\texttt{
+\$ ls -l /etc/rc2.d/S16rc.local \\
+lrwxrwxrwx 1 root root 18 ene 26 20:24 /etc/rc2.d/S16rc.local -\textgreater ../init.d/rc.local \\
+\$ ls -l lunes.txt \\
+-rw-r--r-- 1 lechnerm lechnerm 27 abr  5 15:21 lunes.txt \\
+\$ ls -l /dev/sda\\
+brw-rw---- 1 root disk 8, 0 abr  4 10:34 /dev/sda \\
+\$ ls -l /dev/tty\\
+crw-rw-rw- 1 root root 5, 0 abr  5 16:16 /dev/tty \\
+\$ ls -l /var/run/dbus/system\_bus\_socket \\
+srwxrwxrwx 1 root root 0 abr  4 10:37 /var/run/dbus/system\_bus\_socket\\
+\$ 
+}
+\vspace*{0.4cm} } }
+
+\section*{Atributos}
+El sistema de archivos mantiene distinto tipo de información acerca de cada archivo en él. 
+Como administradores de sistemas, en este curso en particular, nos veremos interesados
+por el tipo de archivo, la cantidad de enlaces a un archivo (ambos vistos en secciones 
+anteriores), el propietario, el grupo al que pertenece y los permisos. 
+
+Para observar estos atributos utilizamos el comando \texttt{ls -l} o \texttt{stat}. 
+El comando \texttt{ls -l} muestra los permisos del archivo,  el  número  de  enlaces  
+que  tiene,  el  nombre  del  propietario,  el  del  grupo  al  que  pertenece, 
+el tamaño (en bytes), una marca de tiempo, y el nombre del archivo (véase man ls).
+
+
+\fcolorbox{black}{grey}{
+\parbox[t]{1.0\linewidth}{ \vspace*{0.4cm}
+{\bf Ejemplo} \\
+\texttt{
+\$ ls -la .  \\
+total 36 \\
+drwxr-xr-x  3 lechnerm lechnerm  4096 abr  5 20:54 . \\
+drwxr-xr-x 89 lechnerm lechnerm 16384 abr  5 19:34 .. \\
+-rw-r--r--  1 lechnerm lechnerm    27 abr  5 15:21 lunes.txt \\
+-rw-r--r--  1 root     root         0 abr  5 20:53 monitor.conf \\
+-rw-r--r--  1 rafa     sudo       833 abr  5 20:52 practico.pdf \\
+-rwxr-x---  1 lechnerm lechnerm     5 abr  5 20:54 script.sh \\
+drwxr-xr-x  2 lechnerm lechnerm  4096 abr  5 18:56 test3 \\
+\$ \\
+}
+Nota: la opción -a del comando \texttt{ls} muestra todos los archivos 
+incluidos los ocultos, que son aquellos que comienzan con ``.''.  
+\vspace*{0.4cm} } }
+
+\subsection*{Propietario y grupo}
+La tercera y cuarta columna de la salida de \texttt{ls -l} representa 
+el usuario y el grupo al que el archivo 
+pertenece respectivamente. En el ejemplo anterior el archivo 
+practico.pdf pertenece al usuario rafa y al grupo sudo. Mientras que 
+el archivo monitor.conf pertenece al usuario root y grupo root. 
+
+De manera predeterminada, al crearse un archivo, este tendrá como 
+dueño al usuario que ejecuta la aplicación que da origen al archivo y 
+como grupo, el grupo primario al que pertenece el mismo usuario. 
+
+En el ejemplo a continuación, el usuario lechnerm ejecuta el comando 
+\texttt{cp} para crear una copia del archivo usars.py dentro del directorio
+\texttt{/tmp}. El archivo original pertenece al usuario rafa, mientras que
+la copia pertenece a lechnerm, ya que este fue el usuario que ejecuto la 
+aplicación (comando) \texttt{cp} que dió origen a la copia: 
+
+\fcolorbox{black}{grey}{
+\parbox[t]{1.0\linewidth}{ \vspace*{0.4cm}
+{\bf Ejemplo} \\
+\texttt{
+\$ id \\
+uid=1000(lechnerm) gid=1000(lechnerm) grupos=1000(lechnerm),24(cdrom), \\
+25(floppy),27(sudo),29(audio),30(dip),44(video),46(plugdev),\\
+\$ ls -l /home/rafa/usars.py  \\
+-rw-r--r-- 1 rafa rafa 205 oct  1  2013 /home/rafa/usars.py \\
+\$ cp /home/rafa/usars.py /tmp/ \\
+\$ ls -l /tmp/usars.py  \\
+-rw-r--r-- 1 lechnerm lechnerm 205 abr  6 23:34 /tmp/usars.py \\
+\$  
+}
+\vspace*{0.4cm} } }
+
+
+Tanto el usuario como el grupo deben existir previamente. El comando 
+que permite la modificación explícita de la propiedad de un archivo es \textbf{\texttt{chown}}
+(del inglés ``\textbf{ch}ange \textbf{own}ership'').
+Por cuestiones de seguridad, un usuario sin privilegios especiales (no root), 
+no podrá cambiar el dueño de un archivo (aún cuando el archivo le pertenezca). 
+Sólo podrá cambiar el grupo al que pertenece el archivo, siempre y cuando el usuario pertenezca a dicho grupo.  
+Por otro lado, el administrador del sistema, root, podrá cambiar el dueño
+y grupo sin restricciones. Siguiendo con el ejemplo anterior: 
+
+
+\fcolorbox{black}{grey}{
+\parbox[t]{1.0\linewidth}{ \vspace*{0.4cm}
+{\bf Ejemplo} \\
+\texttt{
+\$ ls -l /tmp/usars.py  \\
+-rw-r--r-- 1 lechnerm lechnerm 205 abr  6 23:34 /tmp/usars.py \\
+\$ chown rafa.sudo /tmp/usars.py  \\
+chown: cambiando el propietario de «/tmp/usars.py»: Operación no permitida \\
+\$ chown lechnerm.sudo /tmp/usars.py  \\
+\$ ls -l /tmp/usars.py  \\
+-rw-r--r-- 1 lechnerm sudo 205 abr  6 23:34 /tmp/usars.py \\
+\$ chown lechnerm.pulse /tmp/usars.py  \\
+chown: cambiando el propietario de «/tmp/usars.py»: Operación no permitida \\
+\$ sudo su - \\
+\{ sudo \} password for lechnerm:  \\
+\# chown rafa.rafa /tmp/usars.py  \\
+\# ls -l /tmp/usars.py  \\
+-rw-r--r-- 1 rafa rafa 205 abr  6 23:34 /tmp/usars.py \\
+\# 
+}
+\vspace*{0.4cm} } }
+
+\subsection*{Permisos}
+Cada archivo tiene un conjunto de permisos asociados a él, los cuales 
+determinan qué puede hacerse con el archivo y quién puede hacerlo. 
+
+De manera simplificada podemos decir que los permisos de archivos 
+están representados por tres números octales.
+El primer número octal representa lo que puede hacer el dueño del 
+archivo con el mismo; el segundo indica lo que puede hacer el grupo 
+al que pertenece el archivo con el mismo; y el tercer conjunto indica 
+lo que puede hacer cualquier otro usuario que 
+no sea ni el dueño ni pertenezca al grupo (otros).
+
+\fcolorbox{black}{grey}{
+\parbox[t]{1.0\linewidth}{ \vspace*{0.4cm}
+{\bf Ejemplo} \\
+El archivo ``vcninja'' tiene permisos 644. Por ende el dueño, en este
+caso lechnerm, tiene permiso 6, el grupo 4 y el resto del universo 4. \\
+\texttt{
+\$ stat vcninja \\
+  Fichero: «vcninja» \\
+  Tamaño: 24802     	Bloques: 56         Bloque E/S: 4096   fichero regular \\
+Dispositivo: fe01h/65025d	Nodo-i: 5505447     Enlaces: 1 \\
+\textbf{Acceso: (0644/-rw-r--r--)}  Uid: ( 1000/lechnerm)   Gid: ( 501/sudo) \\
+      Acceso: 2013-10-16 14:40:00.076912329 -0300 \\
+Modificación: 2013-10-01 16:02:30.002920012 -0300 \\
+      Cambio: 2013-10-01 16:02:30.030919108 -0300 \\
+    Creación: - \\
+\$ ls -l vcninja \\
+-rw-r--r-- 1 lechnerm sudo 24802 oct  1  2013 vcninja \\
+\$ 
+}
+\vspace*{0.4cm} } }
+
+La elección del sistema octal esta dada por los tres posibles permisos que 
+un archivo puede tener. Estos permisos son:
+\begin{itemize}
+\item Lectura, simbolizado por la letra \textbf{r}
+\item Escritura, simbolizado por la letra \textbf{w}
+\item Ejecución, simbolizado por la letra \textbf{x}
+\end{itemize}
+
+Si asumimos que cada uno de estos tres permisos esta representado 
+por un bit, tal que si el bit esta en 0 el permiso en cuestión es denegado
+mientras que si esta en 1 el permiso es otorgado. Entonces necesitamos 
+tres bits para representar las posibles combinaciones de esos tres permisos 
+y por ende la elección de un número octal (dos al cubo es ocho). 
+
+La siguiente tabla intenta aclarar lo explicado: 
+
+\texttt{
+\begin{center}
+\begin{tabular}{lll}
+\rowcolor{tcA}
+Número octal & Representación binaria & Mapeo a letras\\
+0 & 000  & ---\\
+1 & 001 & --x\\
+2 & 010 & -w-\\
+3 & 011 & -wx\\
+4 & 100 & r--\\
+5 & 101 & r-x\\
+6 & 110 & rw-\\
+7 & 111 & rwx
+\end{tabular}
+\end{center}
+}
+
+Es así que en el ejemplo anterior: 
+
+\texttt{
+\$ ls -l vcninja \\
+-rw-r--r-- 1 lechnerm sudo 24802 oct  1  2013 vcninja \\
+}
+Como vimos en la sección anterior, el primer bit representa el tipo de archivo, en este caso regular. Los 
+siguientes tres bits representan los permisos para el dueño (lechnerm), en este 
+caso \texttt{rw-}, equivalente al número octal 6. Los siguientes tres
+bits representan los permisos para el grupo (sudo), en este caso {\tt r--}, 
+equivalente al número 4 en octal. Los últimos tres bits son los 
+permisos para otros, en este caso también {\tt r--}. 
+
+\subsection*{Archivos regulares frente a directorios}
+
+La interpretación de como funcionan los tres permisos, rwx, depende del 
+tipo de archivo con el que estemos tratando. En particular nos interesa
+lo que sucede con archivos regulares y directorios. 
+
+El caso más sencillo es el de {\it archivos regulares}. Para ellos, la interpretación 
+de {\tt rwx} es la intuitiva. Si {\tt r} se encuentra presente, entonces el contenido del archivo
+puede ser leído (por ejemplo si es de texto a través del comando cat). Si {\tt w}
+se encuentra presente entonces, el archivo en cuestión puede ser modificado 
+(siguiendo con un texto, por ejemplo a través del editor vi). Si {\tt x} se encuentra
+presente, entonces el archivo puede ser ejecutado. Este permiso deberá estar 
+presente para archivos binarios ejecutables (por ejemplo los que están en /bin) y
+cualquier otro archivo que pretendamos ejecutar, por ejemplo un script. 
+
+En el ejemplo de la sección anterior, el archivo vcninja puede ser leído y 
+modificado únicamente por lechnerm; y tanto el grupo como el resto de los 
+usuarios del sistema sólo podrán leerlo. 
+
+En el caso de {\it directorios}, si el permiso {\tt r} está presente
+significa que el usuario puede leer el directorio, por lo que puede 
+conocer qué archivos hay en él por medio del comando {\tt ls}. Si 
+el permiso {\tt w} está presente significa que el usuario puede crear y 
+borra archivos es este directorio, ya que para eso se requiere modificar y, 
+por tanto, escribir sobe el archivo de tipo directorio.
+
+En realidad, no es posible escribir simplemente en un archivo de tipo 
+directorio (ni aún root puede hacerlo). Intentémoslo: 
+
+\texttt{
+\$ echo hola > .  \\
+bash: .: Es un directorio \\
+\$ mkdir test \\
+\$ echo hola > test \\
+bash: test: Es un directorio \\
+\$  
+}
+
+Para modificar el contenido de un archivo de tipo directorio existen 
+llamadas al sistema que crean y borran archivos, y sólo a través de 
+ellas es posible cambiar el contenido de un directorio. Sin embargo, 
+la idea de los permisos aún se aplica: cuando {\tt w} está presente 
+es posible usar las aplicaciones del sistema para modificar el directorio, 
+aplicaciones que terminarán invocando a las llamadas a sistema apropiadas. 
+
+Los permisos para borrar archivos son independientes del archivo mismo. 
+Si el usuario tiene permiso de escritura en un directorio, puede borrar 
+archivos de él, aún los que estén protegidos contra escritura. Sin 
+embargo, el comando rm pide al usuario confirmar antes de borrar
+un archivo protegido para asegurar que eso es lo 
+que en realidad desea hacer, siendo una de las raras ocasiones en las que 
+un programa en UNIX verifica las intenciones del usuario. (La opción {\tt -f} de
+{\tt rm } fuerza al comando a borrar archivos sin necesidad de confirmar.)
+
+El permiso {\tt x} es quizá el menos intuitivo en cuanto a directorios. Este no 
+significa ejecución; significa ``búsqueda''. El permiso de ejecución de 
+un directorio determina si puede buscarse o no un archivo en él. Por lo tanto, 
+es posible crear un directorio con modo {\tt --x} para otros usuarios, lo cual 
+significa que puedan acceder cualquier archivo que conozcan 
+previamente en ese directorio, pero no pueden ejecutar ls sobre él ni leerlo 
+para ver qué archivos tiene. En forma similar, con permisos {\tt r--} los 
+usuarios pueden ver ({\tt ls}) pero no usar el contenido de un directorio. 
+Algunas instalaciones usan esto para desactivar /usr/games durante las horas de trabajo. 
+
+
+\subsection*{Modificando permisos}
+El comando {\tt chmod} (del inglés {\tt ch}ange {\tt mod}e), cambia los 
+permisos de los archivos: 
+
+{\tt chmod {\it permisos archivos..}}
+
+Los permisos podrán especificarse de dos maneras, ya sea como números octales
+(según la tabla vista previamente) o por descripción simbólica. 
+
+\fcolorbox{black}{grey}{
+\parbox[t]{1.0\linewidth}{ \vspace*{0.4cm}
+{\bf Ejemplo} \\
+Sólo el propietario del archivo y root podrán modificar los permisos de un archivo. 
+\texttt{
+\$ ls -l usars.py  \\
+-rw-r--r-- 1 rafa rafa 205 abr  6 23:34 usars.py \\
+\$chmod 755 usars.py  \\
+\$ls -l usars.py  \\
+-rwxr-xr-x 1 rafa rafa 205 abr  6 23:34 usars.py \\
+\$ \# Al grupo le quitamos el permiso de ejecución \\
+\$chmod g-x usars.py  \\
+\$ls -l usars.py  \\
+-rwxr--r-x 1 rafa rafa 205 abr  6 23:34 usars.py \\
+\$ \# Al otros le quitamos el permiso de ejecución \\
+\$chmod o-x  usars.py  \\
+\$ls -l usars.py  \\
+-rwxr--r-- 1 rafa rafa 205 abr  6 23:34 usars.py \\
+\$ \# Agregamos permiso de ejecución para todos (all) \\
+\$chmod a+x usars.py  \\
+\$ls -l usars.py  \\
+-rwxr-xr-x 1 rafa rafa 205 abr  6 23:34 usars.py \\
+\$chmod 644 usars.py  \\
+\$ls -l usars.py  \\
+-rw-r--r-- 1 rafa rafa 205 abr  6 23:34 usars.py \\
+\$ 
+}
+\vspace*{0.4cm} } }
+
+Cada orden de cambio de modo  simbólico  empieza
+       con  cero  o  más  letras  del  conjunto `ugoa': éstas controlan a qué
+       usuarios se referirán los nuevos permisos del fichero  cuyos  permisos
+       se van a cambiar: el usuario propietario (u), otros usuarios distintos
+       del propietario pero del mismo grupo que el  del  fichero  (g),  otros
+       usuarios  que ni son el propietario ni pertenecen al grupo del fichero
+       (o), o todos los usuarios (a). De forma que `a' equivale aquí a `ugo'.
+
+
+ El operador `+' hace que los permisos seleccionados se añadan a los ya
+       existentes en cada fichero; `-' hace que  se  quiten  de  los  que  ya
+       había; y `=' hace que sean los únicos que el fichero va a tener
+(para más información {\tt man chmod}).
+
+
+
+\section*{Licencia}
+Esta obra está licenciada bajo una Licencia Creative Commons Atribución-CompartirDerivadasIgual 3.0 Unported. 
+
+http://creativecommons.org/licenses/by-sa/3.0/
+
+
+\end{document}
+
